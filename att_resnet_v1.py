@@ -199,14 +199,14 @@ att_resnet_v1_101.default_image_size = att_resnet_v1.default_image_size
 
 
 def att_resnet_v1_152(inputs,
-                  num_classes=None,
-                  is_training=True,
-                  global_pool=True,
-                  output_stride=None,
-                  store_non_strided_activations=False,
-                  spatial_squeeze=True,
-                  reuse=None,
-                  scope='att_resnet_v1_152'):
+                      num_classes=None,
+                      is_training=True,
+                      global_pool=True,
+                      output_stride=None,
+                      store_non_strided_activations=False,
+                      spatial_squeeze=True,
+                      reuse=None,
+                      scope='att_resnet_v1_152'):
     blocks = [
         resnet_v1_block('block1', base_depth=64, num_units=3, stride=2),
         resnet_v1_block('block2', base_depth=128, num_units=8, stride=2),
