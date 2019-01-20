@@ -1,8 +1,8 @@
 import tensorflow as tf
-from research.slim.nets import resnet_v1
-from research.slim.nets import resnet_utils
+from nets import resnet_v1
+from nets import resnet_utils
 from official.transformer.model.attention_layer import SelfAttention
-from research.object_detection.utils.shape_utils import combined_static_and_dynamic_shape
+from object_detection.utils.shape_utils import combined_static_and_dynamic_shape
 
 slim = tf.contrib.slim
 bottleneck = resnet_v1.bottleneck
@@ -33,10 +33,10 @@ class SelfAttention2D(SelfAttention):
 
 
 @slim.add_arg_scope
-def self_attention(inputs, hidden_size, num_heads, attention_dropout, is_training,
+def self_attention(inputs, hidden_size, num_heads, attention_dropout, train,
                    outputs_collections=None, scope=None, **kwargs):
     with tf.variable_scope(scope, 'self_attention', [inputs]) as sc:
-        outputs = SelfAttention2D(hidden_size, num_heads, attention_dropout, is_training)(inputs)
+        outputs = SelfAttention2D(hidden_size, num_heads, attention_dropout, train)(inputs)
         return slim.utils.collect_named_outputs(outputs_collections, sc.name, outputs)
 
 
@@ -162,8 +162,8 @@ def att_resnet_v1_50(inputs,
     blocks = [
         resnet_v1_block('block1', base_depth=64, num_units=3, stride=2),
         resnet_v1_block('block2', base_depth=128, num_units=4, stride=2),
-        resnet_v1_block('block3_pre_att', base_depth=256, num_units=6, stride=1),
-        attention_block('block3', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
+        resnet_v1_block('block3', base_depth=256, num_units=6, stride=1),
+        attention_block('block3/attention', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
         resnet_v1_block('block4', base_depth=512, num_units=3, stride=1),
     ]
     return att_resnet_v1(inputs, blocks, num_classes, is_training,
@@ -186,8 +186,8 @@ def att_resnet_v1_101(inputs,
     blocks = [
         resnet_v1_block('block1', base_depth=64, num_units=3, stride=2),
         resnet_v1_block('block2', base_depth=128, num_units=4, stride=2),
-        resnet_v1_block('block3_pre_att', base_depth=256, num_units=23, stride=1),
-        attention_block('block3', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
+        resnet_v1_block('block3', base_depth=256, num_units=23, stride=1),
+        attention_block('block3/attention', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
         resnet_v1_block('block4', base_depth=512, num_units=3, stride=1),
     ]
     return att_resnet_v1(inputs, blocks, num_classes, is_training,
@@ -210,8 +210,8 @@ def att_resnet_v1_152(inputs,
     blocks = [
         resnet_v1_block('block1', base_depth=64, num_units=3, stride=2),
         resnet_v1_block('block2', base_depth=128, num_units=8, stride=2),
-        resnet_v1_block('block3_pre_att', base_depth=256, num_units=36, stride=1),
-        attention_block('block3', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
+        resnet_v1_block('block3', base_depth=256, num_units=36, stride=1),
+        attention_block('block3/attention', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
         resnet_v1_block('block4', base_depth=512, num_units=3, stride=1),
     ]
     return att_resnet_v1(inputs, blocks, num_classes, is_training,
@@ -234,8 +234,8 @@ def att_resnet_v1_200(inputs,
     blocks = [
         resnet_v1_block('block1', base_depth=64, num_units=3, stride=2),
         resnet_v1_block('block2', base_depth=128, num_units=24, stride=2),
-        resnet_v1_block('block3_pre_att', base_depth=256, num_units=36, stride=1),
-        attention_block('block3', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
+        resnet_v1_block('block3', base_depth=256, num_units=36, stride=1),
+        attention_block('block3/attention', num_layers=1, hidden_size=1024, num_heads=2, attention_dropout=0.1, stride=2),
         resnet_v1_block('block4', base_depth=512, num_units=3, stride=1),
     ]
     return att_resnet_v1(inputs, blocks, num_classes, is_training,
