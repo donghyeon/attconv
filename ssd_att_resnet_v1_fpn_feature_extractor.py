@@ -7,10 +7,14 @@ slim = tf.contrib.slim
 
 
 class _SSDAttResnetV1FpnFeatureExtractor(_SSDResnetV1FpnFeatureExtractor):
-    def __init__(self, is_training, *args, **kwargs):
+    def __init__(self, is_training, *args,
+                 num_layers=1, num_heads=2, attention_dropout=0.1, **kwargs):
         super(_SSDAttResnetV1FpnFeatureExtractor, self).__init__(
             is_training, *args, **kwargs)
         self._is_training = is_training
+        self._num_layers = num_layers
+        self._num_heads = num_heads
+        self._attention_dropout = attention_dropout
 
     def extract_features(self, preprocessed_inputs):
         train = self._is_training  # This will enable dropout and LayerNormalization on attention layers only.
@@ -18,7 +22,7 @@ class _SSDAttResnetV1FpnFeatureExtractor(_SSDResnetV1FpnFeatureExtractor):
             return super(_SSDAttResnetV1FpnFeatureExtractor, self).extract_features(preprocessed_inputs)
 
     def _filter_features(self, image_features):
-        filtered_image_features = super(_SSDAttResnetV1FpnFeatureExtractor,self)._filter_features(image_features)
+        filtered_image_features = super(_SSDAttResnetV1FpnFeatureExtractor, self)._filter_features(image_features)
         for key, feature in image_features.items():
             if key.endswidth('attention'):
                 block = key.split('/')[-2]
