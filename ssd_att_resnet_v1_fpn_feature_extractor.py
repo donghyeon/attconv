@@ -24,7 +24,7 @@ class _SSDAttResnetV1FpnFeatureExtractor(_SSDResnetV1FpnFeatureExtractor):
     def _filter_features(self, image_features):
         filtered_image_features = super(_SSDAttResnetV1FpnFeatureExtractor, self)._filter_features(image_features)
         for key, feature in image_features.items():
-            if key.endswidth('attention'):
+            if key.endswith('attention'):
                 block = key.split('/')[-2]
                 filtered_image_features[block] = feature
         return filtered_image_features
