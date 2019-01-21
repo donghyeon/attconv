@@ -22,13 +22,18 @@ class SelfAttention2D(SelfAttention):
     def call(self, x):
         batch_size, width, height, num_channels = combined_static_and_dynamic_shape(x)
         num_pixels = width * height
-        reshape_to_1d_layer = tf.keras.layers.Reshape([num_pixels, num_channels])
-        reshape_to_2d_layer = tf.keras.layers.Reshape([width, height, self.hidden_size])
 
-        x = reshape_to_1d_layer(x)
+        # May be a bug of tf.keras.layers.Reshape.
+        # It changes shape of batch_size to None when target_shape includes a tensor with shape Dimension(None).
+        # reshape_to_1d_layer = tf.keras.layers.Reshape([num_pixels, num_channels])
+        # reshape_to_2d_layer = tf.keras.layers.Reshape([width, height, self.hidden_size])
+
+        # x = reshape_to_1d_layer(x)
+        x = tf.reshape(x, [batch_size, num_pixels, num_channels])
         x = super(SelfAttention2D, self).call(x, bias=(
             tf.zeros([batch_size, 1, 1, num_pixels])))  # No bias needed for attention on conv feature maps
-        x = reshape_to_2d_layer(x)
+        # x = reshape_to_2d_layer(x)
+        x = tf.reshape(x, [batch_size, width, height, self.hidden_size])
         return x
 
 
