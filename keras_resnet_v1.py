@@ -52,10 +52,10 @@ class ResnetV1(tf.keras.Model):
             x = block(x, training=training)
         if self._global_pool:
             x = tf.reduce_mean(x, axis=[1, 2], keepdims=True)
-            if self._spatial_squeeze:
-                x = tf.squeeze(x, axis=[1, 2])
         if self._num_classes:
             x = self._logits(x)
+            if self._spatial_squeeze:
+                x = tf.squeeze(x, axis=[1, 2])
         return x
 
     def restore_from_checkpoint(self, checkpoint_dir):
