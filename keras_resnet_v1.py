@@ -24,10 +24,10 @@ class ResnetV1(tf.keras.Model):
             self._softmax = self.softmax()
 
     def conv1(self):
-        return Stride2BasicConvUnit(64, 7, name='conv1')
+        return Stride2BasicConvUnit(64, 7, dtype=self._dtype, name='conv1')
 
     def pool1(self):
-        return tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same', name='pool1')
+        return tf.keras.layers.MaxPool2D(pool_size=3, strides=2, padding='same', dtype=self._dtype, name='pool1')
 
     def block1(self):
         pass
@@ -42,10 +42,10 @@ class ResnetV1(tf.keras.Model):
         pass
 
     def logits(self):
-        return tf.keras.layers.Conv2D(self._num_classes, 1, name='logits')
+        return tf.keras.layers.Conv2D(self._num_classes, 1, dtype=self._dtype, name='logits')
 
     def softmax(self):
-        return tf.keras.layers.Softmax(name='softmax')
+        return tf.keras.layers.Softmax(dtype=self._dtype, name='softmax')
 
     def stack_blocks(self):
         blocks = [self._block1,
@@ -147,7 +147,7 @@ class BottleneckV1(tf.keras.Model):
         self._conv1 = self.conv1()
         self._conv2 = self.conv2()
         self._conv3 = self.conv3()
-        self._act = tf.keras.layers.Activation(activation, name='activation')
+        self._act = tf.keras.layers.Activation(activation, dtype=dtype, name='activation')
 
     def conv1(self):
         return BasicConvUnit(filters=self._depth, kernel_size=1, dtype=self._dtype, name='conv1')
