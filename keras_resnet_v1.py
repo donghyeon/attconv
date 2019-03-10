@@ -77,6 +77,24 @@ class ResnetV1(tf.keras.Model):
         return x, endpoints
 
     def restore_from_checkpoint(self, checkpoint_dir):
+        assignment_map = self._get_assignment_map_from_checkpoint(checkpoint_dir)
+        tf.train.init_from_checkpoint(checkpoint_dir, assignment_map)
+
+    def restore_from_checkpoint_for_mixed_precision(self, checkpoint_dir, mixed_precision_optimizer):
+        assignment_map = self._get_assignment_map_from_checkpoint(checkpoint_dir)
+        restore_ops = []
+        for var_name in assignment_map:
+            variable = assignment_map[var_name]
+            if variable in mixed_precision_optimizer.vars_fp16_to_fp32:
+                var_fp32 = mixed_precision_optimizer.vars_fp16_to_fp32[variable]
+                restore_op = tf.assign(variable, tf.saturate_cast(var_fp32, tf.float16))
+                restore_ops.append(restore_op)
+                assignment_map[var_name] = var_fp32
+        tf.train.init_from_checkpoint(checkpoint_dir, assignment_map)
+        if restore_ops:
+            return tf.group(restore_ops)
+
+    def _get_assignment_map_from_checkpoint(self, checkpoint_dir):
         if not self.built:
             raise Exception('Build model first and restore variables.')
         checkpoint_variable_names, checkpoint_variable_shapes = zip(*tf.train.list_variables(checkpoint_dir))
@@ -89,7 +107,7 @@ class ResnetV1(tf.keras.Model):
                 variable.name, model_name_scope, checkpoint_name_scope)
             if converted_variable_name in checkpoint_variable_names:
                 assignment_map[converted_variable_name] = variable
-        return tf.train.init_from_checkpoint(checkpoint_dir, assignment_map)
+        return assignment_map
 
 
 def _infer_name_scope(variable_names):
