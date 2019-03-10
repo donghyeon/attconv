@@ -85,7 +85,8 @@ class ResnetV1(tf.keras.Model):
 
         assignment_map = {}
         for variable in self.variables:
-            converted_variable_name = _convert_name_to_slim_style(variable.name, model_name_scope, checkpoint_name_scope)
+            converted_variable_name = _convert_name_to_slim_style(
+                variable.name, model_name_scope, checkpoint_name_scope)
             if converted_variable_name in checkpoint_variable_names:
                 assignment_map[converted_variable_name] = variable
         return tf.train.init_from_checkpoint(checkpoint_dir, assignment_map)
@@ -101,8 +102,7 @@ def _infer_name_scope(variable_names):
 
 def _convert_name_to_slim_style(name, model_name_scope, checkpoint_name_scope):
     name = name.replace(model_name_scope, checkpoint_name_scope)
-    if name.endswith(':0'):
-        name = name[:-2]
+    name = name.split(':')[0]
     if name.endswith('conv2d/kernel'):
         name = name.replace('conv2d/kernel', 'weights')
     if name.endswith('logits/kernel'):
