@@ -61,7 +61,7 @@ def att_resnet_v1(inputs,
         with slim.arg_scope([slim.conv2d, bottleneck,
                              stack_attention_blocks_dense],
                             outputs_collections=end_points_collection):
-            with (slim.arg_scope([slim.batch_norm, self_attention], is_training=is_training)
+            with (slim.arg_scope([slim.batch_norm], is_training=is_training)
                     if is_training is not None else NoOpScope()):
                 net = inputs
                 if include_root_block:
@@ -93,7 +93,7 @@ def att_resnet_v1(inputs,
 att_resnet_v1.default_image_size = 224
 
 
-def attention_block(scope, num_layers, hidden_size, num_heads, attention_dropout, stride):
+def attention_block(scope, hidden_size, num_layers, num_heads, attention_dropout, stride):
     return resnet_utils.Block(scope, self_attention, [{
         'hidden_size': hidden_size,
         'num_heads': num_heads,
@@ -196,10 +196,10 @@ def att_resnet_v1_101(inputs,
         resnet_v1_block('block4', base_depth=512, num_units=3, stride=1),
     ]
     return att_resnet_v1(inputs, blocks, num_classes, is_training,
-                       global_pool=global_pool, output_stride=output_stride,
-                       include_root_block=True, spatial_squeeze=spatial_squeeze,
-                       store_non_strided_activations=store_non_strided_activations,
-                       reuse=reuse, scope=scope)
+                         global_pool=global_pool, output_stride=output_stride,
+                         include_root_block=True, spatial_squeeze=spatial_squeeze,
+                         store_non_strided_activations=store_non_strided_activations,
+                         reuse=reuse, scope=scope)
 att_resnet_v1_101.default_image_size = att_resnet_v1.default_image_size
 
 
